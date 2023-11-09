@@ -1,9 +1,12 @@
+---------------------------------------------------------------------
+-- Fix minimap position on wide screen displays
+---------------------------------------------------------------------
 local hasMinimapChanged = false
 
 function UpdateMinimapLocation()
   Citizen.CreateThread(function()
     -- Get screen aspect ratio
-    local ratio = GetScreenAspectRatio()
+    local ratio = GetScreenAspectRatio(true)
 
     -- Default values for 16:9 monitors
     local posX = -0.0045
@@ -41,7 +44,8 @@ UpdateMinimapLocation()
 TriggerEvent("chat:addSuggestion", "/reload-map", "Update the minimap's screen location")
 
 ---------------------------------------------------------------------
--- Register a key binding for the z key.
+-- Toggle big map with "Z"
+---------------------------------------------------------------------
 RegisterCommand('bigmap', function()
   -- Get the current state of the bigmap.
   local bigmapActive = IsBigmapActive()
@@ -60,6 +64,7 @@ TriggerEvent("chat:addSuggestion", "/bigmap", "Toggle minimap size")
 
 ---------------------------------------------------------------------
 -- Zoom minimap with "G"
+---------------------------------------------------------------------
 local zoomed = false
 Citizen.CreateThread(function()
     while true do
@@ -79,21 +84,23 @@ RegisterKeyMapping("+zoom", "zoom on minmap", "keyboard", "g")
 
 ---------------------------------------------------------------------
 -- Use "M" to go straight to the map
-
-RegisterCommand('map', function(source, args)
-  ActivateFrontendMenu("FE_MENU_VERSION_MP_PAUSE", false, -1) --Opens a frontend-type menu. Scaleform is already loaded, but can be changed.
-  while not IsPauseMenuActive() or IsPauseMenuRestarting() do --Making extra-sure that the frontend menu is fully loaded
+---------------------------------------------------------------------
+RegisterCommand('map', function()
+  ActivateFrontendMenu("FE_MENU_VERSION_MP_PAUSE", false, -1)
+  while not IsPauseMenuActive() or IsPauseMenuRestarting() do
       Wait(0)
   end
-  PauseMenuceptionGoDeeper(0) --Setting up the context menu of the Pause Menu. For other frontend menus, use https://docs.fivem.net/natives/?_0xDD564BDD0472C936
+  PauseMenuceptionGoDeeper(0)
   PauseMenuceptionTheKick()
-  while not IsControlJustPressed(2,202) and not IsControlJustPressed(2,200) and not IsControlJustPressed(2,199) do --Waiting for any of frontend cancel buttons to be hit. Kinda slow but whatever.
+  while not IsControlJustPressed(2,202) and not IsControlJustPressed(2,200) and not IsControlJustPressed(2,199) do
       Wait(0)
   end
-  PauseMenuceptionTheKick() --doesn't really work, but the native's name is funny.
-  SetFrontendActive(false) --Force-closing the entire frontend menu. I wanted a simple back button, but R* forced my hand.
-end)
+  PauseMenuceptionTheKick()
+  SetFrontendActive(false)
+end, false)
 
-RegisterKeyMapping('map', 'Open Map', 'keyboard', Config.OpenKey)
+RegisterKeyMapping('map', 'Open Map', 'keyboard', 'M')
 TriggerEvent("chat:addSuggestion", "/map", "Open Map of San Andreas")
+-------------------------------------------------------------------------------
+-- buh bye!
 -------------------------------------------------------------------------------
