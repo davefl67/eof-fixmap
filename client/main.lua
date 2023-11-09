@@ -50,9 +50,9 @@ RegisterCommand('bigmap', function()
   if bigmapActive then
     SetBigmapActive(false, false)
   else
-    SetBigmapActive(true, true)
+    SetBigmapActive(true, false)
   end
-end)
+end, false)
 
 -- Add the key binding to the key map.
 RegisterKeyMapping('bigmap', 'Toggle minimap size', 'keyboard', 'z')
