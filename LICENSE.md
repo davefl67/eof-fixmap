@@ -14,3 +14,8 @@ as the name is changed.
 TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION**
 
 0. You just DO WHAT THE FUCK YOU WANT TO.
+<div style = "margin-top: 200px;"> 
+
+---
+<img style="vertical-align:middle" src = "https://www.davedorm.com/wtfpl/wtfpl-badge-1.png"> [**Click here**](https://www.wtfpl.org) for more information about the WTFPL
+</div>

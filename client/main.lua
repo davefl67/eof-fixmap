@@ -1,16 +1,15 @@
----------------------------------------------------------------------
--- Fix minimap position on wide screen displays
----------------------------------------------------------------------
 local hasMinimapChanged = false
+local mapState = 0
 
 function UpdateMinimapLocation()
   Citizen.CreateThread(function()
     -- Get screen aspect ratio
-    local ratio = GetScreenAspectRatio(true)
+    local ratio = GetScreenAspectRatio()
 
     -- Default values for 16:9 monitors
     local posX = -0.0045
     local posY = 0.002
+    -- lalala
 
     if tonumber(string.format("%.2f", ratio)) >= 2.3 then
       -- Ultra wide 3440 x 1440 (2.39)
@@ -27,11 +26,11 @@ function UpdateMinimapLocation()
     SetMinimapComponentPosition('minimap_mask', 'L', 'B', posX + 0.0155, posY + 0.03, 0.111, 0.159)
     SetMinimapComponentPosition('minimap_blur', 'L', 'B', posX - 0.0255, posY + 0.02, 0.266, 0.237)
 
-    DisplayRadar(false)
-    SetRadarBigmapEnabled(true, false)
+--    DisplayRadar(false)
+    SetBigmapActive(true, false)
     Citizen.Wait(0)
-    SetRadarBigmapEnabled(false, false)
-    DisplayRadar(true)
+    SetBigmapActive(false, false)
+  --  DisplayRadar(true)
   end)
 end
 
@@ -44,19 +43,20 @@ UpdateMinimapLocation()
 TriggerEvent("chat:addSuggestion", "/reload-map", "Update the minimap's screen location")
 
 ---------------------------------------------------------------------
--- Toggle big map with "Z"
----------------------------------------------------------------------
+-- Register a key binding for the z key.
 RegisterCommand('bigmap', function()
-  -- Get the current state of the bigmap.
-  local bigmapActive = IsBigmapActive()
-
   -- Toggle the state of the bigmap.
-  if bigmapActive then
+  if mapState == 0 then
     SetBigmapActive(false, false)
-  else
+    mapState = 1
+  elseif mapState == 1 then
+    SetBigmapActive(true, true)
+    mapState = 2
+  elseif mapState == 2 then
     SetBigmapActive(true, false)
+    mapState = 0
   end
-end, false)
+end,false)
 
 -- Add the key binding to the key map.
 RegisterKeyMapping('bigmap', 'Toggle minimap size', 'keyboard', 'z')
@@ -64,7 +64,6 @@ TriggerEvent("chat:addSuggestion", "/bigmap", "Toggle minimap size")
 
 ---------------------------------------------------------------------
 -- Zoom minimap with "G"
----------------------------------------------------------------------
 local zoomed = false
 Citizen.CreateThread(function()
     while true do
@@ -84,23 +83,21 @@ RegisterKeyMapping("+zoom", "zoom on minmap", "keyboard", "g")
 
 ---------------------------------------------------------------------
 -- Use "M" to go straight to the map
----------------------------------------------------------------------
-RegisterCommand('map', function()
-  ActivateFrontendMenu("FE_MENU_VERSION_MP_PAUSE", false, -1)
-  while not IsPauseMenuActive() or IsPauseMenuRestarting() do
+
+RegisterCommand('map', function(source, args)
+  ActivateFrontendMenu("FE_MENU_VERSION_MP_PAUSE", false, -1) --Opens a frontend-type menu. Scaleform is already loaded, but can be changed.
+  while not IsPauseMenuActive() or IsPauseMenuRestarting() do --Making extra-sure that the frontend menu is fully loaded
       Wait(0)
   end
-  PauseMenuceptionGoDeeper(0)
+  PauseMenuceptionGoDeeper(0) --Setting up the context menu of the Pause Menu. For other frontend menus, use https://docs.fivem.net/natives/?_0xDD564BDD0472C936
   PauseMenuceptionTheKick()
-  while not IsControlJustPressed(2,202) and not IsControlJustPressed(2,200) and not IsControlJustPressed(2,199) do
+  while not IsControlJustPressed(2,202) and not IsControlJustPressed(2,200) and not IsControlJustPressed(2,199) do --Waiting for any of frontend cancel buttons to be hit. Kinda slow but whatever.
       Wait(0)
   end
-  PauseMenuceptionTheKick()
-  SetFrontendActive(false)
-end, false)
+  PauseMenuceptionTheKick() --doesn't really work, but the native's name is funny.
+  SetFrontendActive(false) --Force-closing the entire frontend menu. I wanted a simple back button, but R* forced my hand.
+end,false)
 
 RegisterKeyMapping('map', 'Open Map', 'keyboard', 'M')
 TriggerEvent("chat:addSuggestion", "/map", "Open Map of San Andreas")
--------------------------------------------------------------------------------
--- buh bye!
 -------------------------------------------------------------------------------
