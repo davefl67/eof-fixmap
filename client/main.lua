@@ -26,11 +26,11 @@ function UpdateMinimapLocation()
     SetMinimapComponentPosition('minimap_mask', 'L', 'B', posX + 0.0155, posY + 0.03, 0.111, 0.159)
     SetMinimapComponentPosition('minimap_blur', 'L', 'B', posX - 0.0255, posY + 0.02, 0.266, 0.237)
 
---    DisplayRadar(false)
+--	DisplayRadar(false)
     SetBigmapActive(true, false)
     Citizen.Wait(0)
     SetBigmapActive(false, false)
-  --  DisplayRadar(true)
+--	DisplayRadar(true)
   end)
 end
 
